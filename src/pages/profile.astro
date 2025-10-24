@@ -10,7 +10,7 @@ if (!osu_api_string) {
 }
 
 const osu_api = parse(osu_api_string);
-const user = await osu_api.getResourceOwner();
+const user = await osu_api.getUser(osu_api.user);
 ---
 
 <Layout>
