@@ -1,25 +1,29 @@
 ---
-
-import * as osu from 'osu-api-v2-js'
-import {parse} from 'flatted';
+import { parse } from 'flatted';
 
 import "../styles/global.css"
 
-let loginURI = '';
+let isLoggedIn = false;
 let avatar_url = '';
 let username = '';
 
-if (!Astro.cookies.has('osuturkiye-api')) {  
-  loginURI = osu.generateAuthorizationURL(import.meta.env.CLIENT_ID, import.meta.env.REDIRECT_URI, [ "identify", "public" ]);
-  console.log('[OAUTH LINK]', loginURI);
-} else {
-  const osu_api = new osu.API(parse(Astro.cookies.get('osuturkiye-api')?.value || ""));
-  const user = await osu_api.getResourceOwner();
-  avatar_url = user.avatar_url;
-  username = user.username;
-  loginURI = '/profile';
+if (Astro.cookies.has('osuturkiye-api')) {
+    try {
+        const osu_api_string = Astro.cookies.get('osuturkiye-api')?.value;
+        if (osu_api_string) {
+            const osu_api = parse(osu_api_string);
+            const user = await osu_api.getMe();
+            if (user) {
+                isLoggedIn = true;
+                avatar_url = user.avatar_url;
+                username = user.username;
+            }
+        }
+    } catch (error) {
+        Astro.cookies.delete('osuturkiye-api', { path: '/' });
+        console.error("Error parsing osu! API cookie:", error);
+    }
 }
-
 ---
 <div class='sticky top-0 w-[97%] text-white rounded-xl px-6 py-4 mx-auto my-5 bg-gradient-to-r from-[#202020] to-[#3d0101]'>
   <div class='flex justify-between items-center w-full px-4 rounded-2xl'>
@@ -58,7 +62,7 @@ if (!Astro.cookies.has('osuturkiye-api')) {
 
     {/* Right side - Login Button */}
     <div class="relative group">
-      {Astro.cookies.has('osuturkiye-api') ? (
+      {isLoggedIn ? (
           <a href="/profile" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <img src={avatar_url} alt={username} class="w-8 h-8 rounded-full border-2 border-white/20 hover:border-red-400 transition-colors"/>
           </a>
@@ -89,7 +93,7 @@ if (!Astro.cookies.has('osuturkiye-api')) {
             </div>
           </div>
       ) : (
-      <a href={loginURI} class='text-sm font-medium hover:text-red-600 transition-colors text-white tracking-wide'>
+      <a href="/login" class='text-sm font-medium hover:text-red-600 transition-colors text-white tracking-wide'>
         Giriş Yap
       </a>
       )}

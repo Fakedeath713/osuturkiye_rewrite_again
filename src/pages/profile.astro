@@ -1,20 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import * as osu from 'osu-api-v2-js';
+import { parse } from 'flatted';
 
+const osu_api_string = Astro.cookies.get('osuturkiye-api')?.value;
+
+if (!osu_api_string) {
+    return Astro.redirect('/login');
+}
+
+const osu_api = parse(osu_api_string);
+const user = await osu_api.getMe();
 ---
 
 <Layout>
-
     <div class="grid grid-cols-1 grid-rows-1 gap-x-4 gap-y-4 w-[97%] mx-auto">
-
         <div class="col-start-1 col-end-1 row-start-1 row-end-1">
             <section class=" bg-[#202020] rounded-xl p-6 mb-6">
-                <p>
-                    Profile
-                </p>
+                <div class="flex items-center">
+                    <img src={user.avatar_url} alt={user.username} class="rounded-full w-24 h-24">
+                    <div class="ml-4">
+                        <h1 class="text-2xl font-bold">{user.username}</h1>
+                        <p>ID: {user.id}</p>
+                    </div>
+                </div>
             </section>
-            
         </div>  
-
     </div>
 </Layout>

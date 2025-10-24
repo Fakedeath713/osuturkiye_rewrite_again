@@ -1,10 +1,26 @@
 ---
 import * as osu from 'osu-api-v2-js';
-import {stringify} from 'flatted';
+import { stringify } from 'flatted';
 
-const token = Astro.url.searchParams.get('code');
-const osu_api = await osu.API.createAsync(parseInt(import.meta.env.CLIENT_ID), import.meta.env.CLIENT_SECRET, {code: token || "", redirect_uri: import.meta.env.REDIRECT_URI});
-Astro.cookies.set('osuturkiye-api', stringify(osu_api));
-return Astro.redirect('/');
+const code = Astro.url.searchParams.get('code');
 
+if (!code) {
+    const clientId = import.meta.env.CLIENT_ID;
+    const redirectUri = import.meta.env.REDIRECT_URI;
+    const authUrl = `https://osu.ppy.sh/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=public`;
+    return Astro.redirect(authUrl);
+} else {
+    try {
+        const osu_api = await osu.API.createAsync(
+            parseInt(import.meta.env.CLIENT_ID),
+            import.meta.env.CLIENT_SECRET,
+            { code, redirect_uri: import.meta.env.REDIRECT_URI }
+        );
+        Astro.cookies.set('osuturkiye-api', stringify(osu_api), { path: '/' });
+        return Astro.redirect('/profile');
+    } catch (error) {
+        console.error("Error during osu! API authentication:", error);
+        return new Response("Authentication failed. Please try again.", { status: 500 });
+    }
+}
 ---
