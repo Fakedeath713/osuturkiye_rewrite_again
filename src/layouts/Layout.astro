@@ -15,8 +15,6 @@ import Navbar from "../components/Navbar.astro";
 	</head>
 	<body class="bg-[#101010] text-white">
 		<Navbar/>
-		<div class="banner">
-		</div>
 		<main>
 			<slot />
 		</main>
@@ -28,11 +26,5 @@ import Navbar from "../components/Navbar.astro";
 	body {
 		margin: 0;
 		width: 100%;
-		height: 100%;
-	}
-	.banner{
-		width: 100%;
-		height: 30rem;
-		background-color: aliceblue;
 	}
 </style>
