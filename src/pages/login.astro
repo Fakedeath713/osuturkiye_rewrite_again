@@ -7,7 +7,7 @@ const code = Astro.url.searchParams.get('code');
 if (!code) {
     const clientId = import.meta.env.CLIENT_ID;
     const redirectUri = import.meta.env.REDIRECT_URI;
-    const authUrl = `https://osu.ppy.sh/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=public`;
+    const authUrl = `https://osu.ppy.sh/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=public identify`;
     return Astro.redirect(authUrl);
 } else {
     try {

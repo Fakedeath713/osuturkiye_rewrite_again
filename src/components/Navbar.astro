@@ -12,7 +12,7 @@ if (Astro.cookies.has('osuturkiye-api')) {
         const osu_api_string = Astro.cookies.get('osuturkiye-api')?.value;
         if (osu_api_string) {
             const osu_api = parse(osu_api_string);
-            const user = await osu_api.getMe();
+            const user = await osu_api.getResourceOwner();
             if (user) {
                 isLoggedIn = true;
                 avatar_url = user.avatar_url;
