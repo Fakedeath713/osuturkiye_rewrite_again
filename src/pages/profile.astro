@@ -1,16 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import * as osu from 'osu-api-v2-js';
-import { parse } from 'flatted';
 
-const osu_api_string = Astro.cookies.get('osuturkiye-api')?.value;
+const token_string = Astro.cookies.get('osuturkiye-token')?.value;
 
-if (!osu_api_string) {
+if (!token_string) {
     return Astro.redirect('/login');
 }
 
-const osu_api = parse(osu_api_string);
-const user = await osu_api.getUser(osu_api.user);
+const token = JSON.parse(token_string);
+const osu_api = new osu.API(token);
+const user = await osu_api.getResourceOwner();
 ---
 
 <Layout>

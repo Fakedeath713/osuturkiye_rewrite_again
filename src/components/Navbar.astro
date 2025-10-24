@@ -1,26 +1,24 @@
 ---
-import { parse } from 'flatted';
-
-import "../styles/global.css"
+import * as osu from 'osu-api-v2-js';
 
 let isLoggedIn = false;
 let avatar_url = '';
 let username = '';
 
-if (Astro.cookies.has('osuturkiye-api')) {
+const token_string = Astro.cookies.get('osuturkiye-token')?.value;
+
+if (token_string) {
     try {
-        const osu_api_string = Astro.cookies.get('osuturkiye-api')?.value;
-        if (osu_api_string) {
-            const osu_api = parse(osu_api_string);
-            const user = await osu_api.getUser(osu_api.user);
-            if (user) {
-                isLoggedIn = true;
-                avatar_url = user.avatar_url;
-                username = user.username;
-            }
+        const token = JSON.parse(token_string);
+        const osu_api = new osu.API(token);
+        const user = await osu_api.getResourceOwner();
+        if (user) {
+            isLoggedIn = true;
+            avatar_url = user.avatar_url;
+            username = user.username;
         }
     } catch (error) {
-        Astro.cookies.delete('osuturkiye-api', { path: '/' });
+        Astro.cookies.delete('osuturkiye-token', { path: '/' });
         console.error("Error parsing osu! API cookie:", error);
     }
 }

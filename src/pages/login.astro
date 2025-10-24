@@ -16,7 +16,13 @@ if (!code) {
             import.meta.env.CLIENT_SECRET,
             { code, redirect_uri: import.meta.env.REDIRECT_URI }
         );
-        Astro.cookies.set('osuturkiye-api', stringify(osu_api), { path: '/' });
+        const token = {
+            access_token: osu_api.access_token,
+            expires_in: osu_api.expires,
+            refresh_token: osu_api.refresh_token,
+            token_type: osu_api.token_type,
+        };
+        Astro.cookies.set('osuturkiye-token', JSON.stringify(token), { path: '/' });
         return Astro.redirect('/profile');
     } catch (error) {
         console.error("Error during osu! API authentication:", error);
