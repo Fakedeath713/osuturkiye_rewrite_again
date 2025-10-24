@@ -44,3 +44,9 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+
+
+
+---FOR DEV---
+Change the "REDIRECT_URI" in the ".env" file when the site is hosted, also change the redirect URI in the osu profile.

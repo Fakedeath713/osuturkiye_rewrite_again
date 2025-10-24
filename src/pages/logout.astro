@@ -1,9 +1,4 @@
 ---
-
-import * as osu from 'osu-api-v2-js';
-import {parse} from 'flatted';
-
-Astro.cookies.delete('osuturkiye-api');
-
-return Astro.redirect('/');
+Astro.cookies.delete("osuturkiye-token", { path: "/" });
+return Astro.redirect("/");
 ---
