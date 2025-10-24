@@ -1,0 +1,55 @@
+---
+// Define the type for game modes
+type GameMode = 'osu' | 'taiko' | 'mania' | 'catch';
+
+// Get the mode from URL query parameter
+const url = new URL(Astro.request.url);
+const gameModeFromUrl = url.searchParams.get('mode');
+
+// Validate and set the mode
+const validModes: GameMode[] = ['osu', 'taiko', 'mania', 'catch'];
+const selectedMode: GameMode = validModes.includes(gameModeFromUrl as GameMode) 
+  ? (gameModeFromUrl as GameMode) 
+  : 'osu';
+
+// Get mode display name
+const getModeDisplayName = (mode: GameMode) => {
+  const modeMap = {
+    'osu': 'Osu!', 
+    'taiko': 'Osu!Taiko',
+    'mania': 'Osu!Mania',
+    'catch': 'Osu!Catch'
+  };
+  return modeMap[mode] || 'Osu!';
+};
+
+// Template content for each mode
+const getModeContent = (mode: GameMode) => {
+  const contentMap = {
+    'osu': {
+      title: 'Osu!'
+    },
+    'taiko': {
+      title: 'Osu!Taiko'
+    },
+    'mania': {
+      title: 'Osu!Mania'
+    },
+    'catch': {
+      title: 'Osu!Catch'
+    }
+  };
+  return contentMap[mode] || contentMap['osu'];
+};
+
+const currentModeContent = getModeContent(selectedMode);
+---
+
+<div class="bg-[#202020] rounded-xl p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-white text-xl font-bold">{currentModeContent.title}</h2>
+        <span class="text-red-400 text-sm font-medium">
+            {getModeDisplayName(selectedMode)}
+        </span>
+    </div>
+</div>

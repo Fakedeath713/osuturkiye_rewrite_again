@@ -1,0 +1,87 @@
+---
+// NewsSection.astro
+interface NewsItem {
+  id: number;
+  title: string;
+  description: string;
+  author: string;
+  avatar: string;
+  date: string;
+}
+
+const newsItems: NewsItem[] = [
+  {
+    id: 1,
+    title: "Kediler",
+    description: "Kediler harika canlilar. Evet, kesinlikle kedileri cok severim.",
+    author: "Azzi",
+    avatar: "/LFG.png",
+    date: "2024-01-15"
+  },
+  {
+    id: 2,
+    title: "Kuslar",
+    description: "Kuslar da oyle. Kuslari da cok seviyorum. Bir kus sahibi olmak harika bir his.",
+    author: "Ruya",
+    avatar: "LFG.png",
+    date: "2024-01-14"
+  },
+    {
+    id: 3,
+    title: "Kuslar",
+    description: "Kuslar da oyle. Kuslari da cok seviyorum. Bir kus sahibi olmak harika bir his.",
+    author: "Ruya",
+    avatar: "LFG.png",
+    date: "2024-01-14"
+  },
+];
+---
+
+<section class=" bg-[#202020] rounded-xl p-6 mb-6">
+  <!-- Section Header -->
+  <div class="mb-6">
+    <h2 class="text-white text-xl font-bold tracking-wide">Haberler</h2>
+  </div>
+
+
+  <div class="space-y-4">
+    {newsItems.map((item) => (
+      <article class="flex gap-4 p-4 bg-[#303030] rounded-lg hover:bg-red-800 transition-colors">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          <img 
+            src={item.avatar} 
+            alt={`${item.author} avatar`}
+            class="w-12 h-12 rounded-full object-cover"
+          />
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Title -->
+          <h3 class="text-white font-semibold text-sm mb-2 line-clamp-2">
+            {item.title}
+          </h3>
+
+          <!-- Description -->
+          <p class="text-gray-300 text-xs leading-relaxed mb-3 line-clamp-3">
+            {item.description}
+          </p>
+
+          <!-- Author and Date -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-green-400 font-medium">{item.author}</span>
+            <span class="text-gray-400">{new Date(item.date).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  {/* View more button - need to limit the amount of news the user will see to a reasonable number. */}
+  <div class="mt-6 text-center">
+    <button class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">
+      View More News
+    </button>
+  </div>
+</section>

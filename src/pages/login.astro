@@ -1,0 +1,10 @@
+---
+import * as osu from 'osu-api-v2-js';
+import {stringify} from 'flatted';
+
+const token = Astro.url.searchParams.get('code');
+const osu_api = await osu.API.createAsync(parseInt(import.meta.env.CLIENT_ID), import.meta.env.CLIENT_SECRET, {code: token || "", redirect_uri: import.meta.env.REDIRECT_URI});
+Astro.cookies.set('osuturkiye-api', stringify(osu_api));
+return Astro.redirect('/');
+
+---
