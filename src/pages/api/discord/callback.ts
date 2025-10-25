@@ -67,6 +67,25 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
             }
         );
 
+        const { DISCORD_BOT_TOKEN, DISCORD_SERVER_ID } = import.meta.env;
+
+        if (DISCORD_BOT_TOKEN && DISCORD_SERVER_ID) {
+            try {
+                await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/members/${discordUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bot ${DISCORD_BOT_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        access_token: access_token,
+                    }),
+                });
+            } catch (error) {
+                console.error('Error joining Discord server:', error);
+            }
+        }
+
         return redirect('/profile');
     } catch (error) {
         console.error('Error during Discord callback:', error);

@@ -7,7 +7,7 @@ export const GET: APIRoute = ({ redirect }) => {
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'code',
-        scope: 'identify',
+        scope: 'identify guilds.join',
     });
 
     const url = `https://discord.com/api/oauth2/authorize?${params.toString()}`;
