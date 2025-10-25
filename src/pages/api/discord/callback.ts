@@ -46,26 +46,6 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
 
         const discordUser = await userResponse.json();
 
-        const { DISCORD_BOT_TOKEN, DISCORD_SERVER_ID } = import.meta.env;
-
-        const joinResponse = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/members/${discordUser.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
-            },
-            body: JSON.stringify({ access_token }),
-        });
-
-        if (!joinResponse.ok) {
-            try {
-                const error = await joinResponse.json();
-                console.error('Error joining Discord server:', error);
-            } catch {
-                console.error('Error joining Discord server:', joinResponse.statusText);
-            }
-        }
-
         const token_string = cookies.get('osuturkiye-token')?.value;
         if (!token_string) {
             return redirect('/login');
@@ -86,6 +66,26 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
                 },
             }
         );
+
+        const { DISCORD_BOT_TOKEN, DISCORD_SERVER_ID } = import.meta.env;
+
+        const joinResponse = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/members/${discordUser.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+            },
+            body: JSON.stringify({ access_token }),
+        });
+
+        if (!joinResponse.ok) {
+            try {
+                const error = await joinResponse.json();
+                console.error('Error joining Discord server:', error);
+            } catch {
+                console.error('Error joining Discord server:', joinResponse.statusText);
+            }
+        }
 
         return redirect('/profile');
     } catch (error) {
