@@ -1,6 +1,7 @@
 ---
 import * as osu from 'osu-api-v2-js';
-import { stringify } from 'flatted';
+import db from '../lib/mongodb';
+import type { User } from '../types/user';
 
 const code = Astro.url.searchParams.get('code');
 
@@ -16,13 +17,31 @@ if (!code) {
             import.meta.env.CLIENT_SECRET,
             { code, redirect_uri: import.meta.env.REDIRECT_URI }
         );
+        const user = await osu_api.getResourceOwner();
+
+        const users = db.collection<User>('users');
+        await users.updateOne(
+            { _id: user.id.toString() },
+            {
+                $set: {
+                    osu_id: user.id,
+                    osu_username: user.username,
+                    updatedAt: new Date(),
+                },
+                $setOnInsert: {
+                    createdAt: new Date(),
+                },
+            },
+            { upsert: true }
+        );
+
         const token = {
             access_token: osu_api.access_token,
-            expires_in: osu_api.expires,
+            expires_in: osu_api.expires_in,
             refresh_token: osu_api.refresh_token,
             token_type: osu_api.token_type,
         };
-        Astro.cookies.set('osuturkiye-token', JSON.stringify(token), { path: '/' });
+        Astro.cookies.set('osuturkiye-token', JSON.stringify(token), { path: '/', maxAge: osu_api.expires_in });
         return Astro.redirect('/profile');
     } catch (error) {
         console.error("Error during osu! API authentication:", error);

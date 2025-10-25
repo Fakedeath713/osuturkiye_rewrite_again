@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import * as osu from 'osu-api-v2-js';
+import db from '../lib/mongodb';
+import type { User } from '../types/user';
 
 const token_string = Astro.cookies.get('osuturkiye-token')?.value;
 
@@ -10,7 +12,10 @@ if (!token_string) {
 
 const token = JSON.parse(token_string);
 const osu_api = new osu.API(token);
-const user = await osu_api.getResourceOwner();
+const osuUser = await osu_api.getResourceOwner();
+
+const users = db.collection<User>('users');
+const user = await users.findOne({ _id: osuUser.id.toString() });
 ---
 
 <Layout>
@@ -18,11 +23,24 @@ const user = await osu_api.getResourceOwner();
         <div class="col-start-1 col-end-1 row-start-1 row-end-1">
             <section class=" bg-[#202020] rounded-xl p-6 mb-6">
                 <div class="flex items-center">
-                    <img src={user.avatar_url} alt={user.username} class="rounded-full w-24 h-24">
+                    <img src={osuUser.avatar_url} alt={osuUser.username} class="rounded-full w-24 h-24">
                     <div class="ml-4">
-                        <h1 class="text-2xl font-bold">{user.username}</h1>
-                        <p>ID: {user.id}</p>
+                        <h1 class="text-2xl font-bold">{osuUser.username}</h1>
+                        <p>ID: {osuUser.id}</p>
                     </div>
+                </div>
+                <div class="mt-4">
+                    {user && user.discord_id ? (
+                        <div>
+                            <h2 class="text-xl font-bold">Discord Account</h2>
+                            <p>ID: {user.discord_id}</p>
+                            <p>Username: {user.discord_username}</p>
+                        </div>
+                    ) : (
+                        <a href="/api/discord/login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Link Discord Account
+                        </a>
+                    )}
                 </div>
             </section>
         </div>  
