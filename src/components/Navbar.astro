@@ -23,36 +23,26 @@ if (token_string) {
     }
 }
 ---
-<div class='sticky top-0 w-[97%] text-white rounded-xl px-6 py-4 mx-auto my-5 bg-gradient-to-r from-[#202020] to-[#3d0101]'>
-  <div class='flex justify-between items-center w-full px-4 rounded-2xl'>
+<div class='sticky top-0 w-full text-white px-6 py-4 bg-[#242424]'>
+  <div class='flex justify-between items-center w-[97%] mx-auto px-4'>
 
     <div class="flex items-center space-x-12">
       {/* Left side - Logo  */}
-      <a href="/" class='text-xl font-bold text-white hover:text-red-400 transition-colors'>
+      <a href="/" class='text-xl font-bold text-white'>
         osu!türkiye
       </a>
 
       {/* Left side - Navigation */}
       <ul class="flex items-center space-x-8">
         <li>
-          <a href='/' class='text-sm font-medium hover:text-red-600 transition-colors text-white'>
+          <a href='/' class='text-sm font-medium text-white'>
             Home
           </a>
         </li>
         
         <li>
-          <a href={"/about"} class='text-sm font-medium hover:text-red-600 transition-colors text-white'>
+          <a href="/about" class='text-sm font-medium text-white bg-red-600 px-4 py-2 rounded-md'>
             About
-          </a>
-        </li>
-        <li>
-          <a href={"/vision"} class='text-sm font-medium hover:text-red-600 transition-colors text-white'>
-            Vision
-          </a>
-        </li>
-        <li>
-          <a href={"/mission"} class='text-sm font-medium hover:text-red-600 transition-colors text-white'>
-            Mission
           </a>
         </li>
       </ul>
@@ -61,10 +51,10 @@ if (token_string) {
     {/* Right side - Login Button */}
     <div class="relative group">
       {isLoggedIn ? (
-          <a href="/profile" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <img src={avatar_url} alt={username} class="w-8 h-8 rounded-full border-2 border-white/20 hover:border-red-400 transition-colors"/>
+          <a href="/profile" class="flex items-center space-x-2">
+            <img src={avatar_url} alt={username} class="w-8 h-8 rounded-full"/>
           </a>
-          <div class="absolute right-0 top-full mt-2 w-48 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] rounded-lg shadow-lg border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out transform translate-y-1 group-hover:translate-y-0 z-50">
+          <div class="absolute right-0 top-full mt-2 w-48 bg-[#2a2a2a] rounded-lg shadow-lg border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out transform translate-y-1 group-hover:translate-y-0 z-50">
             <div class = "py-2">
 
               {/* User Info */}
@@ -74,10 +64,10 @@ if (token_string) {
               </div>
 
               {/* Menu Items */}
-              <a href="/profile" class="block px-4 py-2 text-sm text-white hover:bg-white/5 hover:text-red-400 transition-colors">
+              <a href="/profile" class="block px-4 py-2 text-sm text-white hover:bg-white/5">
                 Profil
               </a>
-              <a href="/settings" class="block px-4 py-2 text-sm text-white hover:bg-white/5 hover:text-red-400 transition-colors">
+              <a href="/settings" class="block px-4 py-2 text-sm text-white hover:bg-white/5">
                 Ayarlar
               </a>
 
@@ -85,13 +75,13 @@ if (token_string) {
               <div class="border-t border-white/10 my-1"></div>
               
               {/* Logout */}
-              <a href="/logout" class="block px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
+              <a href="/logout" class="block px-4 py-2 text-sm text-red-400 hover:bg-red-500/10">
                 Çıkış Yap
               </a>
             </div>
           </div>
       ) : (
-      <a href="/login" class='text-sm font-medium hover:text-red-600 transition-colors text-white tracking-wide'>
+      <a href="/login" class='text-sm font-medium text-white tracking-wide'>
         Giriş Yap
       </a>
       )}
