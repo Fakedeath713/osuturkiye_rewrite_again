@@ -6,25 +6,29 @@ const banners = [
   { id: 4, title: 'Banner 4', image: '/public/81il.png' },
   { id: 5, title: 'Banner 5', image: '/public/81il.png' },
 ];
+
+const prevIndex = banners.length - 1;
+const currentIdx = 0;
+const nextIndex = 1;
 ---
 
-<div class="banner-carousel">
+<div class="banner-carousel" data-banners={JSON.stringify(banners)}>
   <div class="banners">
     <div class="banner-container prev">
-      <img src={banners[banners.length - 1].image} alt="Previous Banner" class="banner">
-      <p class="banner-title">{banners[banners.length - 1].title}</p>
+      <img src={banners[prevIndex].image} alt={banners[prevIndex].title} class="banner">
+      <p class="banner-title">{banners[prevIndex].title}</p>
     </div>
     <div class="banner-container current">
-      <img src={banners[0].image} alt="Current Banner" class="banner">
-      <p class="banner-title">{banners[0].title}</p>
+      <img src={banners[currentIdx].image} alt={banners[currentIdx].title} class="banner">
+      <p class="banner-title">{banners[currentIdx].title}</p>
     </div>
     <div class="banner-container next">
-      <img src={banners[1].image} alt="Next Banner" class="banner">
-      <p class="banner-title">{banners[1].title}</p>
+      <img src={banners[nextIndex].image} alt={banners[nextIndex].title} class="banner">
+      <p class="banner-title">{banners[nextIndex].title}</p>
     </div>
   </div>
-  <button class="arrow left"></button>
-  <button class="arrow right"></button>
+  <button class="arrow left" aria-label="Previous banner"></button>
+  <button class="arrow right" aria-label="Next banner"></button>
 </div>
 
 <style>
@@ -45,11 +49,12 @@ const banners = [
     justify-content: center;
     width: 100%;
     height: 100%;
+    position: relative;
   }
 
   .banner-container {
     position: absolute;
-    transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .banner {
@@ -57,36 +62,28 @@ const banners = [
     height: 281px;
     object-fit: cover;
     border-radius: 10px;
+    display: block;
   }
 
   .banner-container.prev {
     transform: translateX(-350px) scale(0.8);
     filter: brightness(0.5);
+    opacity: 0.7;
     z-index: 0;
-  }
-  
-  .banner-container.prev .banner {
-    background-color: #808000;
   }
 
   .banner-container.current {
     transform: translateX(0) scale(1);
+    filter: brightness(1);
     opacity: 1;
     z-index: 1;
-  }
-  
-  .banner-container.current .banner {
-    box-shadow: 0 0 35px 5px #32cd32;
   }
 
   .banner-container.next {
     transform: translateX(350px) scale(0.8);
     filter: brightness(0.5);
+    opacity: 0.7;
     z-index: 0;
-  }
-  
-  .banner-container.next .banner {
-    background-color: #8b0000;
   }
   
   .banner-title {
@@ -94,20 +91,30 @@ const banners = [
     margin-top: 10px;
     color: white;
     font-size: 1.2rem;
+    font-weight: 500;
   }
 
   .arrow {
     position: absolute;
     top: 40%;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
     background: transparent;
     border: none;
     cursor: pointer;
     z-index: 2;
+    transition: opacity 0.3s ease;
+  }
+
+  .arrow:hover {
+    opacity: 0.7;
+  }
+
+  .arrow:active {
+    opacity: 0.5;
   }
 
   .arrow.left {
-    left: calc(50% - 220px);
+    left: calc(50% - 350px);
     width: 0; 
     height: 0; 
     border-top: 20px solid transparent;
@@ -116,7 +123,7 @@ const banners = [
   }
 
   .arrow.right {
-    right: calc(50% - 220px);
+    left: calc(50% + 350px);
     width: 0; 
     height: 0; 
     border-top: 20px solid transparent;
@@ -125,30 +132,44 @@ const banners = [
   }
 </style>
 
-<script is:inline>
-  document.addEventListener('astro:page-load', () => {
-    const bannersData = [
-      { id: 1, title: 'Banner 1', image: '/81il.png' },
-      { id: 2, title: 'Banner 2', image: '/81il.png' },
-      { id: 3, title: 'Banner 3', image: '/81il.png' },
-      { id: 4, title: 'Banner 4', image: '/81il.png' },
-      { id: 5, title: 'Banner 5', image: '/81il.png' },
-    ];
+<script>
+  function initCarousel() {
+    const bannerCarousel = document.querySelector('.banner-carousel');
+    if (!bannerCarousel) return;
+    
+    const bannersData = JSON.parse(bannerCarousel.dataset.banners);
     let currentIndex = 0;
     let isAnimating = false;
 
     const rightArrow = document.querySelector('.arrow.right');
     const leftArrow = document.querySelector('.arrow.left');
 
+    if (!rightArrow || !leftArrow) return;
+
+    function updateBanner(element, index) {
+      const img = element.querySelector('.banner');
+      const title = element.querySelector('.banner-title');
+      if (img && title) {
+        img.src = bannersData[index].image;
+        img.alt = bannersData[index].title;
+        title.textContent = bannersData[index].title;
+      }
+    }
+
     function handleNext() {
       if (isAnimating) return;
       isAnimating = true;
 
-      currentIndex = (currentIndex + 1) % bannersData.length;
-
       const prevEl = document.querySelector('.banner-container.prev');
       const currentEl = document.querySelector('.banner-container.current');
       const nextEl = document.querySelector('.banner-container.next');
+
+      if (!prevEl || !currentEl || !nextEl) return;
+
+      currentIndex = (currentIndex + 1) % bannersData.length;
+      
+      const newNextIndex = (currentIndex + 1) % bannersData.length;
+      updateBanner(prevEl, newNextIndex);
 
       prevEl.classList.remove('prev');
       prevEl.classList.add('next');
@@ -160,43 +181,46 @@ const banners = [
       nextEl.classList.add('current');
 
       setTimeout(() => {
-        const newNextIndex = (currentIndex + 1) % bannersData.length;
-        const newNextEl = document.querySelector('.banner-container.next');
-        newNextEl.querySelector('.banner').src = bannersData[newNextIndex].image;
-        newNextEl.querySelector('.banner-title').textContent = bannersData[newNextIndex].title;
         isAnimating = false;
-      }, 500);
+      }, 600);
     }
     
     function handlePrev() {
       if (isAnimating) return;
       isAnimating = true;
 
-      currentIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
-
       const prevEl = document.querySelector('.banner-container.prev');
       const currentEl = document.querySelector('.banner-container.current');
       const nextEl = document.querySelector('.banner-container.next');
       
-      prevEl.classList.remove('prev');
-      prevEl.classList.add('current');
+      if (!prevEl || !currentEl || !nextEl) return;
+
+      currentIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
+      
+      const newPrevIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
+      updateBanner(nextEl, newPrevIndex);
+
+      nextEl.classList.remove('next');
+      nextEl.classList.add('prev');
 
       currentEl.classList.remove('current');
       currentEl.classList.add('next');
 
-      nextEl.classList.remove('next');
-      nextEl.classList.add('prev');
+      prevEl.classList.remove('prev');
+      prevEl.classList.add('current');
       
       setTimeout(() => {
-        const newPrevIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
-        const newPrevEl = document.querySelector('.banner-container.prev');
-        newPrevEl.querySelector('.banner').src = bannersData[newPrevIndex].image;
-        newPrevEl.querySelector('.banner-title').textContent = bannersData[newPrevIndex].title;
         isAnimating = false;
-      }, 500);
+      }, 600);
     }
 
     rightArrow.addEventListener('click', handleNext);
     leftArrow.addEventListener('click', handlePrev);
-  });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initCarousel);
+  
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initCarousel);
 </script>
