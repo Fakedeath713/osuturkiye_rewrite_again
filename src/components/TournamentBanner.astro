@@ -1,157 +1,202 @@
 ---
+const banners = [
+  { id: 1, title: 'Banner 1', image: '/public/81il.png' },
+  { id: 2, title: 'Banner 2', image: '/public/81il.png' },
+  { id: 3, title: 'Banner 3', image: '/public/81il.png' },
+  { id: 4, title: 'Banner 4', image: '/public/81il.png' },
+  { id: 5, title: 'Banner 5', image: '/public/81il.png' },
+];
 ---
-<div class="tournament-banner-container">
-  <div class="tournament-banner">
-    <a href="#" class="banner-item-wrapper banner-item-left">
-      <div class="banner-item yellow">
-        <div class="arrow left-arrow"></div>
-      </div>
-      <p class="banner-text">Lorem ipsum</p>
-    </a>
-    <a href="#" class="banner-item-wrapper banner-item-center">
-      <div class="banner-item green">
-      </div>
-      <p class="banner-text">Lorem ipsum dolor sit amet falan filan</p>
-    </a>
-    <a href="#" class="banner-item-wrapper banner-item-right">
-      <div class="banner-item red">
-        <div class="arrow right-arrow"></div>
-      </div>
-      <p class="banner-text">Lorem ipsum</p>
-    </a>
+
+<div class="banner-carousel">
+  <div class="banners">
+    <div class="banner-container prev">
+      <img src={banners[banners.length - 1].image} alt="Previous Banner" class="banner">
+      <p class="banner-title">{banners[banners.length - 1].title}</p>
+    </div>
+    <div class="banner-container current">
+      <img src={banners[0].image} alt="Current Banner" class="banner">
+      <p class="banner-title">{banners[0].title}</p>
+    </div>
+    <div class="banner-container next">
+      <img src={banners[1].image} alt="Next Banner" class="banner">
+      <p class="banner-title">{banners[1].title}</p>
+    </div>
   </div>
+  <button class="arrow left"></button>
+  <button class="arrow right"></button>
 </div>
 
 <style>
-  .tournament-banner-container {
+  .banner-carousel {
+    position: relative;
+    width: 100%;
+    height: 400px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 400px;
-    position: relative;
-    margin-top: 50px;
+    overflow: hidden;
+    background-color: #2a2a2e;
   }
 
-  .tournament-banner {
+  .banners {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    position: relative;
+    height: 100%;
   }
 
-  .banner-item-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .banner-container {
     position: absolute;
-    transition: all 0.5s ease-in-out;
+    transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
   }
 
-  .banner-item {
-    width: 300px;
-    height: 180px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .banner {
+    width: 500px;
+    height: 281px;
+    object-fit: cover;
+    border-radius: 10px;
   }
 
-  .banner-item.yellow {
-    background-color: #a2a200;
+  .banner-container.prev {
+    transform: translateX(-350px) scale(0.8);
+    filter: brightness(0.5);
+    z-index: 0;
+  }
+  
+  .banner-container.prev .banner {
+    background-color: #808000;
   }
 
-  .banner-item.green {
-    background-color: #00ff00;
-    width: 400px;
-    height: 240px;
+  .banner-container.current {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    z-index: 1;
+  }
+  
+  .banner-container.current .banner {
+    box-shadow: 0 0 35px 5px #32cd32;
   }
 
-  .banner-item.red {
+  .banner-container.next {
+    transform: translateX(350px) scale(0.8);
+    filter: brightness(0.5);
+    z-index: 0;
+  }
+  
+  .banner-container.next .banner {
     background-color: #8b0000;
   }
-
-  .banner-item-center {
-    z-index: 10;
-    transform: scale(1.1);
-  }
-
-  .banner-item-left {
-    z-index: 5;
-    transform: translateX(-250px) scale(0.9);
-    filter: brightness(0.7);
-  }
-
-  .banner-item-right {
-    z-index: 5;
-    transform: translateX(250px) scale(0.9);
-    filter: brightness(0.7);
-  }
-
-  .banner-text {
-    color: white;
+  
+  .banner-title {
+    text-align: center;
     margin-top: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.9rem;
+    color: white;
+    font-size: 1.2rem;
   }
 
   .arrow {
-    border: solid rgba(255, 255, 255, 0.7);
-    border-width: 0 6px 6px 0;
-    display: inline-block;
-    padding: 12px;
-    transition: border-color 0.3s;
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
   }
 
-  .arrow:hover {
-    border-color: white;
+  .arrow.left {
+    left: calc(50% - 220px);
+    width: 0; 
+    height: 0; 
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 20px solid #d1c7a8;
   }
 
-  .left-arrow {
-    transform: rotate(135deg);
+  .arrow.right {
+    right: calc(50% - 220px);
+    width: 0; 
+    height: 0; 
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #d1c7a8;
   }
-
-  .right-arrow {
-    transform: rotate(-45deg);
-  }
-
 </style>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const bannerItems = document.querySelectorAll('.banner-item-wrapper');
-    const leftArrow = document.querySelector('.left-arrow');
-    const rightArrow = document.querySelector('.right-arrow');
+<script is:inline>
+  document.addEventListener('astro:page-load', () => {
+    const bannersData = [
+      { id: 1, title: 'Banner 1', image: '/81il.png' },
+      { id: 2, title: 'Banner 2', image: '/81il.png' },
+      { id: 3, title: 'Banner 3', image: '/81il.png' },
+      { id: 4, title: 'Banner 4', image: '/81il.png' },
+      { id: 5, title: 'Banner 5', image: '/81il.png' },
+    ];
+    let currentIndex = 0;
+    let isAnimating = false;
 
-    let positions = ['banner-item-left', 'banner-item-center', 'banner-item-right'];
+    const rightArrow = document.querySelector('.arrow.right');
+    const leftArrow = document.querySelector('.arrow.left');
 
-    const updateBannerPositions = () => {
-      bannerItems.forEach((item, i) => {
-        item.classList.remove('banner-item-left', 'banner-item-center', 'banner-item-right');
-        item.classList.add(positions[i]);
-      });
-    };
+    function handleNext() {
+      if (isAnimating) return;
+      isAnimating = true;
 
-    const cyclePositions = (direction) => {
-      if (direction === 'left') {
-        positions.push(positions.shift());
-      } else {
-        positions.unshift(positions.pop());
-      }
-      updateBannerPositions();
-    };
+      currentIndex = (currentIndex + 1) % bannersData.length;
 
-    if(leftArrow && rightArrow) {
-      leftArrow.parentElement.parentElement.addEventListener('click', (e) => {
-        e.preventDefault();
-        cyclePositions('left');
-      });
+      const prevEl = document.querySelector('.banner-container.prev');
+      const currentEl = document.querySelector('.banner-container.current');
+      const nextEl = document.querySelector('.banner-container.next');
 
-      rightArrow.parentElement.parentElement.addEventListener('click', (e) => {
-        e.preventDefault();
-        cyclePositions('right');
-      });
+      prevEl.classList.remove('prev');
+      prevEl.classList.add('next');
+      
+      currentEl.classList.remove('current');
+      currentEl.classList.add('prev');
+      
+      nextEl.classList.remove('next');
+      nextEl.classList.add('current');
+
+      setTimeout(() => {
+        const newNextIndex = (currentIndex + 1) % bannersData.length;
+        const newNextEl = document.querySelector('.banner-container.next');
+        newNextEl.querySelector('.banner').src = bannersData[newNextIndex].image;
+        newNextEl.querySelector('.banner-title').textContent = bannersData[newNextIndex].title;
+        isAnimating = false;
+      }, 500);
     }
+    
+    function handlePrev() {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      currentIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
+
+      const prevEl = document.querySelector('.banner-container.prev');
+      const currentEl = document.querySelector('.banner-container.current');
+      const nextEl = document.querySelector('.banner-container.next');
+      
+      prevEl.classList.remove('prev');
+      prevEl.classList.add('current');
+
+      currentEl.classList.remove('current');
+      currentEl.classList.add('next');
+
+      nextEl.classList.remove('next');
+      nextEl.classList.add('prev');
+      
+      setTimeout(() => {
+        const newPrevIndex = (currentIndex - 1 + bannersData.length) % bannersData.length;
+        const newPrevEl = document.querySelector('.banner-container.prev');
+        newPrevEl.querySelector('.banner').src = bannersData[newPrevIndex].image;
+        newPrevEl.querySelector('.banner-title').textContent = bannersData[newPrevIndex].title;
+        isAnimating = false;
+      }, 500);
+    }
+
+    rightArrow.addEventListener('click', handleNext);
+    leftArrow.addEventListener('click', handlePrev);
   });
 </script>
