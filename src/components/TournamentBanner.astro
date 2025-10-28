@@ -1,0 +1,157 @@
+---
+---
+<div class="tournament-banner-container">
+  <div class="tournament-banner">
+    <a href="#" class="banner-item-wrapper banner-item-left">
+      <div class="banner-item yellow">
+        <div class="arrow left-arrow"></div>
+      </div>
+      <p class="banner-text">Lorem ipsum</p>
+    </a>
+    <a href="#" class="banner-item-wrapper banner-item-center">
+      <div class="banner-item green">
+      </div>
+      <p class="banner-text">Lorem ipsum dolor sit amet falan filan</p>
+    </a>
+    <a href="#" class="banner-item-wrapper banner-item-right">
+      <div class="banner-item red">
+        <div class="arrow right-arrow"></div>
+      </div>
+      <p class="banner-text">Lorem ipsum</p>
+    </a>
+  </div>
+</div>
+
+<style>
+  .tournament-banner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    position: relative;
+    margin-top: 50px;
+  }
+
+  .tournament-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+  }
+
+  .banner-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    transition: all 0.5s ease-in-out;
+  }
+
+  .banner-item {
+    width: 300px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .banner-item.yellow {
+    background-color: #a2a200;
+  }
+
+  .banner-item.green {
+    background-color: #00ff00;
+    width: 400px;
+    height: 240px;
+  }
+
+  .banner-item.red {
+    background-color: #8b0000;
+  }
+
+  .banner-item-center {
+    z-index: 10;
+    transform: scale(1.1);
+  }
+
+  .banner-item-left {
+    z-index: 5;
+    transform: translateX(-250px) scale(0.9);
+    filter: brightness(0.7);
+  }
+
+  .banner-item-right {
+    z-index: 5;
+    transform: translateX(250px) scale(0.9);
+    filter: brightness(0.7);
+  }
+
+  .banner-text {
+    color: white;
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+
+  .arrow {
+    border: solid rgba(255, 255, 255, 0.7);
+    border-width: 0 6px 6px 0;
+    display: inline-block;
+    padding: 12px;
+    transition: border-color 0.3s;
+  }
+
+  .arrow:hover {
+    border-color: white;
+  }
+
+  .left-arrow {
+    transform: rotate(135deg);
+  }
+
+  .right-arrow {
+    transform: rotate(-45deg);
+  }
+
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const bannerItems = document.querySelectorAll('.banner-item-wrapper');
+    const leftArrow = document.querySelector('.left-arrow');
+    const rightArrow = document.querySelector('.right-arrow');
+
+    let positions = ['banner-item-left', 'banner-item-center', 'banner-item-right'];
+
+    const updateBannerPositions = () => {
+      bannerItems.forEach((item, i) => {
+        item.classList.remove('banner-item-left', 'banner-item-center', 'banner-item-right');
+        item.classList.add(positions[i]);
+      });
+    };
+
+    const cyclePositions = (direction) => {
+      if (direction === 'left') {
+        positions.push(positions.shift());
+      } else {
+        positions.unshift(positions.pop());
+      }
+      updateBannerPositions();
+    };
+
+    if(leftArrow && rightArrow) {
+      leftArrow.parentElement.parentElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        cyclePositions('left');
+      });
+
+      rightArrow.parentElement.parentElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        cyclePositions('right');
+      });
+    }
+  });
+</script>
