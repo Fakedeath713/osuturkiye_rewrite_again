@@ -21,6 +21,11 @@ const communitiesJson = JSON.stringify(communities);
             <div class="scrollbar-thumb"></div>
         </div>
     </div>
+    <div class="arrow-separator">
+        <span>&gt;</span>
+        <span>&gt;</span>
+        <span>&gt;</span>
+    </div>
     <div class="right-pane">
         <div class="title-box" id="community-name-box"></div>
         <div class="content-container">
@@ -28,11 +33,6 @@ const communitiesJson = JSON.stringify(communities);
                 <div class="content" data-index={index}>
                     <p class="content-description">{community.description}</p>
                     <a href={community.link} class="join-button" target="_blank" rel="noopener noreferrer">Join Here!</a>
-                    <div class="arrow-container">
-                        <span class="arrow">▶</span>
-                        <span class="arrow">▶</span>
-                        <span class="arrow">▶</span>
-                    </div>
                 </div>
             ))}
         </div>
@@ -46,6 +46,7 @@ const communitiesJson = JSON.stringify(communities);
         if (!component) return;
 
         const slider = component.querySelector('.slider');
+        const sliderContainer = component.querySelector('.slider-container');
         const scrollbar = component.querySelector('.slider-scrollbar');
         const thumb = component.querySelector('.scrollbar-thumb');
         const slides = component.querySelectorAll('.slide');
@@ -65,48 +66,91 @@ const communitiesJson = JSON.stringify(communities);
         }
 
         function updateThumbPosition() {
-            const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+            const maxScrollLeft = sliderContainer.scrollWidth - sliderContainer.clientWidth;
             if (maxScrollLeft <= 0) {
                 thumb.style.width = '100%';
                 thumb.style.left = '0px';
                 return;
             }
-            const scrollRatio = slider.scrollLeft / maxScrollLeft;
-            const thumbWidth = scrollbar.clientWidth * (slider.clientWidth / slider.scrollWidth);
+            const scrollRatio = sliderContainer.scrollLeft / maxScrollLeft;
+            const visibleRatio = sliderContainer.clientWidth / sliderContainer.scrollWidth;
+            const thumbWidth = Math.max(scrollbar.clientWidth * visibleRatio, 30); // Minimum 30px
             thumb.style.width = `${thumbWidth}px`;
             const thumbMaxMove = scrollbar.clientWidth - thumbWidth;
             thumb.style.left = `${scrollRatio * thumbMaxMove}px`;
         }
 
-        slider.addEventListener('mousedown', (e) => {
+        // Add click functionality to scrollbar
+        scrollbar.addEventListener('click', (e) => {
+            const rect = scrollbar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const scrollbarWidth = scrollbar.clientWidth;
+            const thumbWidth = parseFloat(thumb.style.width);
+            const maxThumbMove = scrollbarWidth - thumbWidth;
+            const maxScrollLeft = sliderContainer.scrollWidth - sliderContainer.clientWidth;
+            
+            // Calculate where to scroll based on click position
+            const targetThumbLeft = Math.max(0, Math.min(clickX - thumbWidth / 2, maxThumbMove));
+            const scrollRatio = targetThumbLeft / maxThumbMove;
+            sliderContainer.scrollLeft = scrollRatio * maxScrollLeft;
+        });
+
+        // Add drag functionality to scrollbar thumb
+        let isDraggingThumb = false;
+        let thumbStartX = 0;
+        let scrollStartLeft = 0;
+
+        thumb.addEventListener('mousedown', (e) => {
+            isDraggingThumb = true;
+            thumbStartX = e.clientX;
+            scrollStartLeft = sliderContainer.scrollLeft;
+            e.stopPropagation(); // Prevent scrollbar click event
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDraggingThumb) return;
+            e.preventDefault();
+            
+            const deltaX = e.clientX - thumbStartX;
+            const thumbWidth = parseFloat(thumb.style.width);
+            const maxThumbMove = scrollbar.clientWidth - thumbWidth;
+            const maxScrollLeft = sliderContainer.scrollWidth - sliderContainer.clientWidth;
+            
+            const scrollDelta = (deltaX / maxThumbMove) * maxScrollLeft;
+            sliderContainer.scrollLeft = Math.max(0, Math.min(scrollStartLeft + scrollDelta, maxScrollLeft));
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingThumb = false;
+        });
+
+        // Mouse drag on slider container
+        sliderContainer.addEventListener('mousedown', (e) => {
             isDown = true;
-            slider.classList.add('active');
-            startX = e.pageX - slider.offsetLeft;
-            scrollLeft = slider.scrollLeft;
-            slider.style.cursor = 'grabbing';
+            sliderContainer.classList.add('active');
+            startX = e.pageX - sliderContainer.offsetLeft;
+            scrollLeft = sliderContainer.scrollLeft;
         });
 
-        slider.addEventListener('mouseleave', () => {
+        sliderContainer.addEventListener('mouseleave', () => {
             isDown = false;
-            slider.classList.remove('active');
-            slider.style.cursor = 'grab';
+            sliderContainer.classList.remove('active');
         });
 
-        slider.addEventListener('mouseup', () => {
+        sliderContainer.addEventListener('mouseup', () => {
             isDown = false;
-            slider.classList.remove('active');
-            slider.style.cursor = 'grab';
+            sliderContainer.classList.remove('active');
         });
 
-        slider.addEventListener('mousemove', (e) => {
+        sliderContainer.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
-            const x = e.pageX - slider.offsetLeft;
+            const x = e.pageX - sliderContainer.offsetLeft;
             const walk = (x - startX) * 2;
-            slider.scrollLeft = scrollLeft - walk;
+            sliderContainer.scrollLeft = scrollLeft - walk;
         });
         
-        slider.addEventListener('scroll', updateThumbPosition);
+        sliderContainer.addEventListener('scroll', updateThumbPosition);
         window.addEventListener('resize', updateThumbPosition);
 
         slides.forEach((slide, index) => {
@@ -125,59 +169,84 @@ const communitiesJson = JSON.stringify(communities);
 <style>
     .communities-wrapper {
         display: flex;
-        gap: 20px;
+        gap: 0; /* Let the separator handle the spacing */
+        align-items: center; /* Vertically center panes and separator */
         background: transparent;
-        padding: 20px;
-        font-family: sans-serif;
-        width: 95%;
+        padding: 15px 20px; /* Reduced vertical padding */
+        font-family: Metropolis;
+        width: 85%; /* Reduced width */
+        max-width: 1400px; /* Add max-width for consistency */
         margin: 0 auto;
+        transform: scale(0.85); /* Scaled down more from 0.9 */
+        transform-origin: top center;
     }
     .left-pane, .right-pane {
         background-color: #242424;
-        padding: 20px;
-        padding-top: 35px;
+        padding: 15px; /* Reduced padding */
+        padding-top: 30px; /* Reduced top padding */
         position: relative;
-    }
-    .left-pane {
-        flex-basis: 55%;
+        height: 180px; /* Reduced from 220px */
+        display: flex;
+        flex-direction: column;
+        width: 0; /* Set to 0 to let flex-grow work properly */
+        flex-grow: 1; /* Both grow equally */
+        flex-shrink: 1; /* Both shrink equally */
+        flex-basis: 0; /* Start from 0 basis for true equality */
     }
     .right-pane {
-        flex-basis: 45%;
         color: #E0E0E0;
+    }
+    .arrow-separator {
+        display: flex;
+        flex-direction: row; /* Changed from column to row */
+        align-items: center;
+        justify-content: center;
+        padding: 0 15px;
+        color: #c0c0c0;
+        gap: 4px; /* Smaller gap for horizontal arrows */
+        flex-shrink: 0; /* Prevent separator from shrinking */
+    }
+    .arrow-separator span {
+        font-size: 24px;
+        line-height: 1;
     }
     .title-box {
         position: absolute;
         top: -10px;
-        left: 20px;
+        left: 15px; /* Adjusted to match new padding */
         background-color: #F0F0F0;
         color: #1F1F1F;
         padding: 4px 8px;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: bold;
         z-index: 10;
     }
     .slider-container {
-        overflow-x: auto;
+        overflow-x: scroll; /* Changed from auto to scroll */
         overflow-y: hidden;
         scrollbar-width: none;
         -ms-overflow-style: none;
         max-width: 100%;
+        margin-top: 10px; /* Add some space below title */
+        cursor: grab;
+    }
+    .slider-container:active {
+        cursor: grabbing;
     }
     .slider-container::-webkit-scrollbar {
         display: none;
     }
     .slider {
         display: flex;
-        gap: 16px;
-        padding-bottom: 16px;
-        cursor: grab;
+        gap: 12px; /* Reduced gap */
+        padding-bottom: 12px;
         user-select: none;
         width: max-content;
     }
     .slide {
-        flex: 0 0 110px;
-        height: 110px;
-        border: 3px solid #555;
+        flex: 0 0 calc(100% / 6.5); /* Smaller items - show more at once */
+        aspect-ratio: 1 / 1;
+        border: 2px solid #555; /* Thinner border */
         transition: border-color 0.3s ease;
         background-color: #1a1a1a;
     }
@@ -191,14 +260,14 @@ const communitiesJson = JSON.stringify(communities);
     }
     .slider-scrollbar {
         width: 100%;
-        height: 4px;
+        height: 4px; /* Slightly thicker for better visibility */
         background-color: #1a1a1a;
         border-radius: 2px;
         position: relative;
         margin-top: 8px;
+        cursor: pointer; /* Make it clear it's interactive */
     }
     .scrollbar-thumb {
-        width: 25%;
         height: 100%;
         background-color: #D60032;
         border-radius: 2px;
@@ -206,37 +275,36 @@ const communitiesJson = JSON.stringify(communities);
     }
     .content {
         display: none;
+        flex-grow: 1;
+        flex-direction: column;
     }
     .content.active {
-        display: block;
+        display: flex; /* Use flexbox */
+    }
+    .content-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
     }
     .content-description {
-        font-size: 13px;
-        line-height: 1.5;
-        margin-bottom: 16px;
-        color: #c0c0c0;
-    }
-    .arrow-container {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-    .arrow {
-        color: #666;
-        font-size: 12px;
+        font-size: 16px; /* Increased font size to match template */
+        line-height: 1.6;
+        color: #E0E0E0; /* Changed to lighter color to match template */
+        flex-grow: 1; /* Allow description to take available space */
     }
     .join-button {
         display: inline-block;
         background-color: #D60032;
         color: white;
-        padding: 8px 20px;
+        padding: 6px 16px; /* Slightly smaller button */
         text-decoration: none;
         font-weight: normal;
-        font-size: 13px;
+        font-size: 12px;
         border: none;
         border-radius: 0;
         transition: background-color 0.3s ease;
+        align-self: flex-start; /* Align to the left */
+        margin-top: auto; /* Push to the bottom */
     }
     .join-button:hover {
         background-color: #E50036;
