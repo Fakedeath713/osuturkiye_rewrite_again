@@ -147,7 +147,9 @@ const communitiesJson = JSON.stringify(communities);
             e.preventDefault();
             const x = e.pageX - sliderContainer.offsetLeft;
             const walk = (x - startX) * 2;
-            sliderContainer.scrollLeft = scrollLeft - walk;
+            const newScrollLeft = scrollLeft - walk;
+            const maxScrollLeft = sliderContainer.scrollWidth - sliderContainer.clientWidth;
+            sliderContainer.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
         });
         
         
@@ -229,7 +231,6 @@ const communitiesJson = JSON.stringify(communities);
         max-width: 100%;
         margin-top: 10px; /* Add some space below title */
         cursor: grab;
-        padding-right: 0;
     }
     .slider-container:active {
         cursor: grabbing;
@@ -245,7 +246,7 @@ const communitiesJson = JSON.stringify(communities);
         width: max-content;
     }
     .slide {
-        flex: 0 0 calc(100% / 7.5); /* Smaller items - show more at once */
+        flex: 0 0 6rem; /* Use a fixed rem value for consistent sizing */
         aspect-ratio: 1 / 1;
         border: 2px solid #555; /* Thinner border */
         transition: border-color 0.3s ease;
