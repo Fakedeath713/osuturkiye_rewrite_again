@@ -22,9 +22,9 @@ const communitiesJson = JSON.stringify(communities);
         </div>
     </div>
     <div class="arrow-separator">
-        <span>&gt;</span>
-        <span>&gt;</span>
-        <span>&gt;</span>
+        <span class="triangle"></span>
+        <span class="triangle"></span>
+        <span class="triangle"></span>
     </div>
     <div class="right-pane">
         <div class="title-box" id="community-name-box"></div>
@@ -150,6 +150,7 @@ const communitiesJson = JSON.stringify(communities);
             sliderContainer.scrollLeft = scrollLeft - walk;
         });
         
+        
         sliderContainer.addEventListener('scroll', updateThumbPosition);
         window.addEventListener('resize', updateThumbPosition);
 
@@ -169,21 +170,20 @@ const communitiesJson = JSON.stringify(communities);
 <style>
     .communities-wrapper {
         display: flex;
-        gap: 0; /* Let the separator handle the spacing */
-        align-items: center; /* Vertically center panes and separator */
+        gap: 0;
+        align-items: center;
         background: transparent;
-        padding: 15px 20px; /* Reduced vertical padding */
+        padding: 10px 10px;        /* was 15px 20px */
         font-family: Metropolis;
-        width: 85%; /* Reduced width */
-        max-width: 1400px; /* Add max-width for consistency */
+        width: 95%;               /* was 85% — closer to edges */
+        max-width: 1500px;        
         margin: 0 auto;
-        transform: scale(0.85); /* Scaled down more from 0.9 */
-        transform-origin: top center;
+        transform: none;          /* REMOVE scale */
     }
     .left-pane, .right-pane {
         background-color: #242424;
-        padding: 15px; /* Reduced padding */
-        padding-top: 30px; /* Reduced top padding */
+        padding: 18px; /* Reduced padding */
+        padding-top: 35px; /* Reduced top padding */
         position: relative;
         height: 180px; /* Reduced from 220px */
         display: flex;
@@ -222,13 +222,14 @@ const communitiesJson = JSON.stringify(communities);
         z-index: 10;
     }
     .slider-container {
-        overflow-x: scroll; /* Changed from auto to scroll */
+        overflow-x: auto; /* Changed from auto to scroll */
         overflow-y: hidden;
         scrollbar-width: none;
         -ms-overflow-style: none;
         max-width: 100%;
         margin-top: 10px; /* Add some space below title */
         cursor: grab;
+        padding-right: 0;
     }
     .slider-container:active {
         cursor: grabbing;
@@ -238,13 +239,13 @@ const communitiesJson = JSON.stringify(communities);
     }
     .slider {
         display: flex;
-        gap: 12px; /* Reduced gap */
+        gap: 15px; /* Reduced gap */
         padding-bottom: 12px;
         user-select: none;
         width: max-content;
     }
     .slide {
-        flex: 0 0 calc(100% / 6.5); /* Smaller items - show more at once */
+        flex: 0 0 calc(100% / 7.5); /* Smaller items - show more at once */
         aspect-ratio: 1 / 1;
         border: 2px solid #555; /* Thinner border */
         transition: border-color 0.3s ease;
@@ -309,4 +310,29 @@ const communitiesJson = JSON.stringify(communities);
     .join-button:hover {
         background-color: #E50036;
     }
+    /* Triangles between panes */
+.arrow-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    gap: 6px; /* spacing between triangles */
+}
+
+/* Each triangle */
+.arrow-separator .triangle {
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid #c0c0c0;  /* triangle color */
+}
+
+/* Hover glow effect (optional, matches osu! vibe) */
+.arrow-separator .triangle:hover {
+    border-left-color: #ffffff;
+    cursor: pointer;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
 </style>
