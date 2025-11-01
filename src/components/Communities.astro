@@ -2,159 +2,243 @@
 import { getCommunities } from "../lib/communities";
 
 const communities = await getCommunities();
+const communitiesJson = JSON.stringify(communities);
 ---
 
-<div class="communities-container">
-  <div class="slider-container">
-    <h2 class="slider-title">Topluluklar</h2>
-    <div class="slider">
-      {communities.map((community, index) => (
-        <div class="slide" data-index={index}>
-          <img src={community.image} alt={community.name} />
+<div class="communities-wrapper" id="communities-component">
+    <div class="left-pane">
+        <div class="title-box">Topluluklar</div>
+        <div class="slider-container">
+            <div class="slider">
+                {communities.map((community, index) => (
+                    <div class="slide" data-index={index}>
+                        <img src={community.image} alt={community.name} draggable="false" />
+                    </div>
+                ))}
+            </div>
         </div>
-      ))}
+        <div class="slider-scrollbar">
+            <div class="scrollbar-thumb"></div>
+        </div>
     </div>
-    <div class="slider-controls">
-      <button class="prev">&#9664;</button>
-      <div class="slider-bar">
-        <div class="slider-progress"></div>
-      </div>
-      <button class="next">&#9654;</button>
+    <div class="right-pane">
+        <div class="title-box" id="community-name-box"></div>
+        <div class="content-container">
+            {communities.map((community, index) => (
+                <div class="content" data-index={index}>
+                    <p class="content-description">{community.description}</p>
+                    <a href={community.link} class="join-button" target="_blank" rel="noopener noreferrer">Join Here!</a>
+                    <div class="arrow-container">
+                        <span class="arrow">▶</span>
+                        <span class="arrow">▶</span>
+                        <span class="arrow">▶</span>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
-  </div>
-  <div class="content-container">
-    {communities.map((community, index) => (
-      <div class="content" data-index={index}>
-        <h3 class="content-title">{community.name}</h3>
-        <p class="content-description">{community.description}</p>
-        <a href={community.link} class="join-button" target="_blank">Join Now!</a>
-      </div>
-    ))}
-  </div>
 </div>
 
-<style>
-  .communities-container {
-    display: flex;
-    gap: 2rem;
-    padding: 2rem;
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .slider-container {
-    width: 60%;
-  }
-  .slider-title {
-    color: white;
-    margin-bottom: 1rem;
-  }
-  .slider {
-    display: flex;
-    overflow: hidden;
-    gap: 1rem;
-  }
-  .slide {
-    flex: 0 0 150px;
-    height: 150px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: border-color 0.3s;
-  }
-  .slide.active {
-    border-color: #ff4500;
-  }
-  .slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .slider-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .slider-bar {
-    flex-grow: 1;
-    height: 5px;
-    background-color: #333;
-  }
-  .slider-progress {
-    height: 100%;
-    background-color: #ff4500;
-    width: 0;
-  }
-  .prev, .next {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  .content-container {
-    width: 40%;
-  }
-  .content {
-    display: none;
-    color: white;
-  }
-  .content.active {
-    display: block;
-  }
-  .content-title {
-    margin-bottom: 1rem;
-  }
-  .join-button {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #ff4500;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-top: 1rem;
-  }
-</style>
+<script define:vars={{ communitiesJson }}>
+    document.addEventListener('DOMContentLoaded', () => {
+        const communities = JSON.parse(communitiesJson);
+        const component = document.getElementById('communities-component');
+        if (!component) return;
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const slides = document.querySelectorAll(".slide");
-    const contents = document.querySelectorAll(".content");
-    const prevButton = document.querySelector(".prev");
-    const nextButton = document.querySelector(".next");
-    const progress = document.querySelector(".slider-progress");
+        const slider = component.querySelector('.slider');
+        const scrollbar = component.querySelector('.slider-scrollbar');
+        const thumb = component.querySelector('.scrollbar-thumb');
+        const slides = component.querySelectorAll('.slide');
+        const contents = component.querySelectorAll('.content');
+        const dynamicTitleBox = component.querySelector('#community-name-box');
 
-    let currentIndex = 0;
+        let isDown = false;
+        let startX;
+        let scrollLeft;
 
-    function updateContent() {
-      slides.forEach((slide, index) => {
-        slide.classList.toggle("active", index === currentIndex);
-      });
-      contents.forEach((content, index) => {
-        content.classList.toggle("active", index === currentIndex);
-      });
-      const progressWidth = (currentIndex / (slides.length - 1)) * 100;
-      progress.style.width = `${progressWidth}%`;
-    }
+        function updateActive(index) {
+            slides.forEach((s, i) => s.classList.toggle('active', i === index));
+            contents.forEach((c, i) => c.classList.toggle('active', i === index));
+            if (communities[index]) {
+                dynamicTitleBox.textContent = communities[index].name;
+            }
+        }
 
-    slides.forEach((slide) => {
-      slide.addEventListener("click", () => {
-        currentIndex = parseInt(slide.dataset.index);
-        updateContent();
-      });
+        function updateThumbPosition() {
+            const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+            if (maxScrollLeft <= 0) {
+                thumb.style.width = '100%';
+                thumb.style.left = '0px';
+                return;
+            }
+            const scrollRatio = slider.scrollLeft / maxScrollLeft;
+            const thumbWidth = scrollbar.clientWidth * (slider.clientWidth / slider.scrollWidth);
+            thumb.style.width = `${thumbWidth}px`;
+            const thumbMaxMove = scrollbar.clientWidth - thumbWidth;
+            thumb.style.left = `${scrollRatio * thumbMaxMove}px`;
+        }
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.classList.add('active');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+            slider.style.cursor = 'grabbing';
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab';
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab';
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+        
+        slider.addEventListener('scroll', updateThumbPosition);
+        window.addEventListener('resize', updateThumbPosition);
+
+        slides.forEach((slide, index) => {
+            slide.addEventListener('click', () => {
+                updateActive(index);
+            });
+        });
+
+        if (slides.length > 0) {
+            updateActive(0);
+            setTimeout(updateThumbPosition, 100);
+        }
     });
-
-    prevButton.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-      updateContent();
-    });
-
-    nextButton.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % slides.length;
-      updateContent();
-    });
-
-    updateContent();
-  });
 </script>
+
+<style>
+    .communities-wrapper {
+        display: flex;
+        gap: 20px;
+        background: transparent;
+        padding: 20px;
+        font-family: sans-serif;
+        width: 95%;
+        margin: 0 auto;
+    }
+    .left-pane, .right-pane {
+        background-color: #242424;
+        padding: 20px;
+        padding-top: 35px;
+        position: relative;
+    }
+    .left-pane {
+        flex-basis: 55%;
+    }
+    .right-pane {
+        flex-basis: 45%;
+        color: #E0E0E0;
+    }
+    .title-box {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background-color: #F0F0F0;
+        color: #1F1F1F;
+        padding: 4px 8px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 10;
+    }
+    .slider-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        max-width: 100%;
+    }
+    .slider-container::-webkit-scrollbar {
+        display: none;
+    }
+    .slider {
+        display: flex;
+        gap: 16px;
+        padding-bottom: 16px;
+        cursor: grab;
+        user-select: none;
+        width: max-content;
+    }
+    .slide {
+        flex: 0 0 110px;
+        height: 110px;
+        border: 3px solid #555;
+        transition: border-color 0.3s ease;
+        background-color: #1a1a1a;
+    }
+    .slide.active {
+        border-color: #E0E0E0;
+    }
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .slider-scrollbar {
+        width: 100%;
+        height: 4px;
+        background-color: #1a1a1a;
+        border-radius: 2px;
+        position: relative;
+        margin-top: 8px;
+    }
+    .scrollbar-thumb {
+        width: 25%;
+        height: 100%;
+        background-color: #D60032;
+        border-radius: 2px;
+        position: absolute;
+    }
+    .content {
+        display: none;
+    }
+    .content.active {
+        display: block;
+    }
+    .content-description {
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+        color: #c0c0c0;
+    }
+    .arrow-container {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .arrow {
+        color: #666;
+        font-size: 12px;
+    }
+    .join-button {
+        display: inline-block;
+        background-color: #D60032;
+        color: white;
+        padding: 8px 20px;
+        text-decoration: none;
+        font-weight: normal;
+        font-size: 13px;
+        border: none;
+        border-radius: 0;
+        transition: background-color 0.3s ease;
+    }
+    .join-button:hover {
+        background-color: #E50036;
+    }
+</style>

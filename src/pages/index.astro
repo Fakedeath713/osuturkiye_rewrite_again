@@ -1,13 +1,23 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import TournamentBanner from '../components/TournamentBanner.astro';
+import Communities from '../components/Communities.astro';
 
 import '../styles/index.css';
-import Communities from '../components/Communities.astro';
 
 ---
 
 <Layout>
   <TournamentBanner />
+  <div class="separator"></div>
   <Communities />
 </Layout>
+
+<style>
+  .separator {
+    width: 95%;
+    height: 2px;
+    background-color: #D60032; /* Red color */
+    margin: 20px auto;
+  }
+</style>
